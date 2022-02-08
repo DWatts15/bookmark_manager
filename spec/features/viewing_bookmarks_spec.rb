@@ -1,3 +1,5 @@
+require 'pg'
+
 feature 'Viewing bookmarks' do
   scenario 'A user can see bookmarks' do
     visit('/bookmarks')
