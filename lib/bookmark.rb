@@ -24,12 +24,19 @@ class Bookmark
 
   def self.create(url:, title:)
     if ENV['ENVIRONMENT'] == 'test'
-      connection = PG.connect(dbname: 'bookmark_manager_test')
+     connection = PG.connect(dbname: 'bookmark_manager_test')
     else
-      connection = PG.connect(dbname: 'bookmark_manager')
+     connection = PG.connect(dbname: 'bookmark_manager')
     end
-  
-    result = connection.exec("INSERT INTO bookmarks (url, title) VALUES('#{url}', '#{title}') RETURNING id, title, url;")
+
+    # I've broken it on to twp lines to make it a bit more readable
+    result = connection.exec_params(
+      # The first argument is our SQL query template
+      # The second argument is the 'params' referred to in exec_params
+      # $1 refers to the first item in the params array
+      # $2 refers to the second item in the params array
+      "INSERT INTO bookmarks (url, title) VALUES($1, $2) RETURNING id, title, url;", [url, title]
+    )
     Bookmark.new(id: result[0]['id'], title: result[0]['title'], url: result[0]['url'])
-  end
+end
 end
